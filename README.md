@@ -1,4 +1,4 @@
-To-Do List Gamificada
+To-Do Streak 🔥
 
 Uma plataforma web de lista de tarefas (To-Do List) focada em construir e manter hábitos através de um sistema gamificado de "streaks" (sequências).
 
