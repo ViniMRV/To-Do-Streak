@@ -16,8 +16,19 @@ Including another URLconf
 """
 
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
+from django.views.generic import RedirectView
+from django.conf.urls.static import static
+from django.conf import settings
+
+FRONTEND_URL = "http://localhost:3000/"
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("", RedirectView.as_view(url=FRONTEND_URL, permanent=False), name="home"),
+    path("users/", include(("Users.urls", "users"), namespace="users")),
+    path("lists/", include(("Lists.urls", "lists"), namespace="lists")),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

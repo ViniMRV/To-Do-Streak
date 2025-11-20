@@ -25,9 +25,20 @@ SECRET_KEY = "django-insecure-r3-i+f4b+c4en$w+%30aas9ahnaj2ak1etrn2c-h%ehwxt67+9
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    ".github.dev",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:8000",
+    "https://localhost:8000",
+    "https://*.github.dev",
 
 
+    #adicionar outros hosts aqui se necessario (ex: link dos codespaces)
+]
 # Application definition
 
 INSTALLED_APPS = [
@@ -37,9 +48,13 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "corsheaders",
+    "Users",
+    "Lists",
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -50,6 +65,13 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = "todostreak.urls"
+
+FRONTEND_DOMAIN = os.environ.get("FRONTEND_DOMAIN", "localhost:3000")
+
+CORS_ALLOWED_ORIGINS = [
+    f"http://{FRONTEND_DOMAIN}",
+    f"https://{FRONTEND_DOMAIN}",
+]
 
 TEMPLATES = [
     {
@@ -115,6 +137,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = "static/"
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
