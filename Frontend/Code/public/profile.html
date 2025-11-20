@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Perfil - To-Do Streak</title>
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/profile.css">
+    <script type="module" src="javascript/profile.js"></script>
+</head>
+<body>
+    <iframe src="header.html" style="border:none; width:100%; height:60px; display:block;"></iframe>
+
+    <div class="container">
+        <h1>Alterar Senha</h1>
+        
+        <form id="changePasswordForm">
+            <label for="oldPassword">Senha Atual</label>
+            <input type="password" id="oldPassword" name="oldPassword" required placeholder="Digite sua senha atual">
+
+            <label for="newPassword">Nova Senha</label>
+            <input type="password" id="newPassword" name="newPassword" required placeholder="Digite a nova senha">
+
+            <label for="confirmPassword">Confirmar Nova Senha</label>
+            <input type="password" id="confirmPassword" name="confirmPassword" required placeholder="Repita a nova senha">
+
+            <div class="form-actions">
+                <button type="submit" class="btn-primary">Salvar Alterações</button>
+                <a href="index.html" class="btn-secondary">Cancelar</a>
+            </div>
+        </form>
+
+        <div id="message" class="feedback-message"></div>
+    </div>
+</body>
+</html>
