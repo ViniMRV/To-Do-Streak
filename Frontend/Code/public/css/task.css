@@ -1,0 +1,17 @@
+/* Formulário de Tarefa */
+form label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 5px;
+    color: #555;
+}
+
+.form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.form-actions button, .form-actions a {
+    flex: 1; /* Faz os botões ocuparem o mesmo tamanho */
+}
