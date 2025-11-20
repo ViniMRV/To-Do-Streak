@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - To-Do Streak</title>
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/auth.css">
+    <script type="module" src="javascript/auth.js"></script>
+</head>
+<body>
+    <div class="container auth-container">
+        <a href="#" class="auth-logo">To-Do Streak 🔥</a>
+        <p class="auth-subtitle">Mantenha o foco, construa hábitos.</p>
+
+        <form id="loginForm">
+            <label for="email" style="text-align: left;">E-mail</label>
+            <input type="email" id="email" name="email" required placeholder="seu@email.com">
+
+            <label for="password" style="text-align: left;">Senha</label>
+            <input type="password" id="password" name="password" required placeholder="Sua senha">
+            
+            <a href="forgot-password.html" class="forgot-password">Esqueci minha senha</a>
+
+            <button type="submit" class="btn-primary">Entrar</button>
+        </form>
+
+        <div class="auth-footer">
+            Não tem uma conta? <a href="register.html">Cadastre-se</a>
+        </div>
+    </div>
+</body>
+</html>
