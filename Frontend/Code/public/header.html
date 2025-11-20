@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Header</title>
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/header.css">
+</head>
+<body>
+    <header class="navbar">
+        <div class="logo">
+            <a href="index.html" target="_parent">To-Do Streak 🔥</a>
+        </div>
+        
+        <nav>
+            <ul>
+                <li>
+                    <a href="index.html" target="_parent">Home</a>
+                </li>
+                <li>
+                    <a href="task.html" target="_parent">Nova Tarefa</a>
+                </li>
+                <li>
+                    <a href="#" id="logoutBtn" class="logout-link">Sair</a>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <script>
+        // Script simples para Logout (Limpa token e redireciona)
+        document.getElementById('logoutBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            // Limpa o token do localStorage (acessível mesmo dentro do iframe se mesma origem)
+            localStorage.removeItem('token');
+            // Redireciona a página "pai" (a janela principal) para o login
+            window.parent.location.href = 'login.html';
+        });
+    </script>
+</body>
+</html>
