@@ -1,130 +1,85 @@
 import secrets
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-from rest_framework.authtoken.models import Token
-from rest_framework.permissions import IsAuthenticated, AllowAny
-
-from django.contrib.auth import authenticate
 from django.conf import settings
 from django.core.mail import send_mail
 from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import force_str
 from django.contrib.auth.tokens import default_token_generator
 
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.permissions import IsAuthenticated, AllowAny
+
 from .models import User
-from .forms import UserRegistrationForm, CustomPasswordResetForm
+from .forms import CustomPasswordResetForm
+from .serializers import RegisterSerializer, UserSerializer
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 class RegisterUserView(APIView):
-    """
-    API View para registrar um novo usuário.
-    Recebe um JSON com os campos do formulário de registro.
-    """
+    """API endpoint para registrar usuário usando DRF serializer."""
     permission_classes = [AllowAny]
-    
-    if form.is_valid():
-        try:
-            user = form.save(commit = False)
-            user.is_active = False  
-            user.activation_token = secrets.token_urlsafe(32)
-            user.save()
+
+    def post(self, request):
+        serializer = RegisterSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
 
             frontend_domain = getattr(settings, 'FRONTEND_DOMAIN', 'localhost:3000')
-            activation_link = f"http://{frontend_domain}/ativar-conta/{ user.activation_token }/"
+            activation_link = f"http://{frontend_domain}/ativar-conta/{user.activation_token}/"
 
-            send_mail(
-                'Ative sua conta',
-                f'Hello World!\n\n Clique no link para ativar sua conta: { activation_link }',
-                settings.DEFAULT_FROM_EMAIL,
-                [user.email],
-                fail_silently=False,
-            )
+            try:
+                send_mail(
+                    'Ative sua conta',
+                    f'Olá!\n\nClique no link para ativar sua conta: {activation_link}',
+                    getattr(settings, 'DEFAULT_FROM_EMAIL', None),
+                    [user.email],
+                    fail_silently=True,
+                )
+            except Exception:
+                # don't block registration if email sending fails in dev
+                pass
 
-            return Response(
-                {"message": "Usuário registrado com sucesso. Verifique seu e-mail para ativar a conta."}, 
-                status=status.HTTP_201_CREATED
-            )
-        except Exception as e:
-            return Response(
-                {"error": "Erro ao processar o cadastro.", "details": str(e)},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-    return Response(form.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(UserSerializer(user).data, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class ActivateUserView(APIView):
-    """
-    API View para ativar a conta do usuário.
-    Recebe o token de ativação na URL.
-    """
+    """Ativa conta do usuário a partir do token de ativação."""
     permission_classes = [AllowAny]
 
     def post(self, request, token):
         try:
             user = User.objects.get(activation_token=token)
-
-            if user.is_active:
-                return Response(
-                    {"message": "Essa conta já está ativa."}, 
-                    status=status.HTTP_200_OK
-                )
-                user.is_active = True
-                user.activation_token = None
-                user.save()
-
-                return Response(
-                    {"message": "Conta ativada com sucesso."}, 
-                    status=status.HTTP_200_OK
-                )
         except User.DoesNotExist:
-            return Response(
-                {"error": "Token de ativação inválido ou expirado."}, 
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response({"error": "Token inválido."}, status=status.HTTP_400_BAD_REQUEST)
 
-class LoginUserView(APIView):
-    """
-    Autentica o usuario e retorna um Token de acesso.
-    """
+        if user.is_active:
+            return Response({"message": "Conta já ativa."}, status=status.HTTP_200_OK)
+
+        user.is_active = True
+        user.activation_token = None
+        user.save()
+        return Response({"message": "Conta ativada com sucesso."}, status=status.HTTP_200_OK)
+
+class LoginUserView(TokenObtainPairView):
+    """Login que retorna par de tokens (access + refresh) usando SimpleJWT."""
     permission_classes = [AllowAny]
-
-    def post(self, request):
-        email = request.data.get("email")
-        password = request.data.get("password")
-
-        if not email or not password:
-            return Response(
-                {"error": "Email e senha são obrigatórios."}, 
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        user = authenticate(request, username=email, password=password)
-
-        if user is not None:
-            if not user.is_active:
-                return Response(
-                    {"error": "Conta não ativada. Por favor, ative sua conta via e-mail."}, 
-                    status=status.HTTP_401_UNAUTHORIZED
-                )
-            token, created = Token.objects.get_or_create(user=user)
-            return Response({
-                    "token": token.key,
-                    "user_id": user.pk,
-                    "name": f"{user.first_name} {user.last_name}",
-                    "email": user.email,
-                    "profile_picture": user.profile_picture.url if user.profile_picture else None,
-                }, 
-                status=status.HTTP_200_OK
-            )
-        return Response({"error": "Email ou senha inválidos."}, status=status.HTTP_401_UNAUTHORIZED)
   
 class LogoutUserView(APIView):
-    """
-    Realiza logout do usuário, invalidando o Token de acesso.
-    """
+    """Logout para JWT: recebe refresh token e adiciona à blacklist."""
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        request.user.auth_token.delete()  
-        return Response({"message": "Logout realizado com sucesso."}, status=status.HTTP_200_OK)
+        refresh_token = request.data.get("refresh")
+        if not refresh_token:
+            return Response({"error": "Refresh token is required."}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            from rest_framework_simplejwt.tokens import RefreshToken
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+            return Response({"message": "Logout ok."}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": "Invalid token."}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserPasswordResetView(APIView):

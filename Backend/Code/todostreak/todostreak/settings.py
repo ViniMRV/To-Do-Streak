@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -49,6 +50,8 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "corsheaders",
+    "rest_framework",
+    "rest_framework_simplejwt.token_blacklist",
     "Users",
     "Lists",
 ]
@@ -67,6 +70,13 @@ MIDDLEWARE = [
 ROOT_URLCONF = "todostreak.urls"
 
 FRONTEND_DOMAIN = os.environ.get("FRONTEND_DOMAIN", "localhost:3000")
+
+CORS_ALLOW_CREDENTIALS = True  
+
+CSRF_TRUSTED_ORIGINS = [
+    f"http://{FRONTEND_DOMAIN}",
+      f"https://{FRONTEND_DOMAIN}"
+]
 
 CORS_ALLOWED_ORIGINS = [
     f"http://{FRONTEND_DOMAIN}",
@@ -145,3 +155,25 @@ MEDIA_ROOT = BASE_DIR / "media"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# If you are using a custom user model, declare it here BEFORE the first migrate
+AUTH_USER_MODEL = "Users.User"
+
+# Django REST Framework + Simple JWT configuration
+from datetime import timedelta
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ),
+    "DEFAULT_PERMISSION_CLASSES": (
+        "rest_framework.permissions.IsAuthenticated",
+    ),
+}
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "ROTATE_REFRESH_TOKENS": False,
+    "BLACKLIST_AFTER_ROTATION": True,
+}

@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.conf import settings
 
 def path_to_profile_picture(instance, filename):
     type = filename.split('.')[-1] # get file extension
@@ -19,8 +20,8 @@ class User(AbstractUser):
 
 
 class UserList(models.Model):
-    user = models.ForeignKey(Users.User, on_delete=models.CASCADE)
-    list_name = models.ForeignKey(Lists.List, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    list_name = models.ForeignKey("Lists.List", on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

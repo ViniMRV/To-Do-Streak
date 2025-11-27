@@ -1,8 +1,10 @@
 from django import forms
 from .models import User
 from django.conf import settings
-from django.contib.auth.forms import PasswordResetForm
+from django.contrib.auth.forms import PasswordResetForm
+import os
 
+domain_override = os.environ.get("FRONTEND_DOMAIN", "localhost:3000")
 
 class UserRegistrationForm(forms.ModelForm):
 
@@ -60,12 +62,12 @@ class UserRegistrationForm(forms.ModelForm):
 class CustomPasswordResetForm(PasswordResetForm):
     def save(self, domain_override=None, subject_template_name=None, email_template_name=None, use_https=False,
              token_generator=None, from_email=None, request=None, html_email_template_name=None, extra_email_context=None):
-        
-        domain_override = settings.SITE_DOMAIN
+        # prefer explicit domain_override, fallback to FRONTEND_DOMAIN
+        domain_override = domain_override or getattr(settings, "FRONTEND_DOMAIN", os.environ.get("FRONTEND_DOMAIN", "localhost:3000"))
         use_https = True
         subject_template_name = None
         self.subject = "Redefinição de senha - To-Do Streak"
-        
+
         return super().save(
             domain_override=domain_override,
             subject_template_name=subject_template_name,

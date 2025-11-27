@@ -21,13 +21,13 @@ from django.views.generic import RedirectView
 from django.conf.urls.static import static
 from django.conf import settings
 
-FRONTEND_URL = "http://localhost:3000/"
+FRONTEND_URL = f"http://{settings.FRONTEND_DOMAIN}/"
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", RedirectView.as_view(url=FRONTEND_URL, permanent=False), name="home"),
-    path("users/", include(("Users.urls", "users"), namespace="users")),
-    path("lists/", include(("Lists.urls", "lists"), namespace="lists")),
+    path("users/", include("Users.urls")),
+    path("lists/", include("Lists.urls")),
 ]
 
 if settings.DEBUG:
