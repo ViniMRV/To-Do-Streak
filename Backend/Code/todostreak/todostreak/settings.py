@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "rest_framework",
     "rest_framework_simplejwt.token_blacklist",
+    "drf_spectacular",
     "Users",
     "Lists",
 ]
@@ -169,6 +170,7 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": (
         "rest_framework.permissions.IsAuthenticated",
     ),
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
 SIMPLE_JWT = {
@@ -176,4 +178,11 @@ SIMPLE_JWT = {
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     "ROTATE_REFRESH_TOKENS": False,
     "BLACKLIST_AFTER_ROTATION": True,
+}
+
+# drf-spectacular (OpenAPI/Swagger) settings
+SPECTACULAR_SETTINGS = {
+    "TITLE": "To-Do Streak API",
+    "DESCRIPTION": "API do backend do To-Do Streak (DRF + SimpleJWT)",
+    "VERSION": "1.0.0",
 }

@@ -14,6 +14,10 @@ class User(AbstractUser):
     activation_token = models.CharField(max_length=64, blank=True, null=True)
     email = models.EmailField (unique=True)
     profile_picture = models.ImageField(upload_to=path_to_profile_picture, null=True, blank=True)
+    # global streak counter: number of consecutive days the user completed at least one full list
+    streak_count = models.IntegerField(default=0)
+    # last date the streak was incremented (to avoid double counting in same day)
+    last_streak_date = models.DateField(null=True, blank=True)
 
     def __str__(self):
         return f"{ self.username }"

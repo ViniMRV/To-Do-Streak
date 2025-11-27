@@ -20,7 +20,7 @@ from django.urls import path, include
 from django.views.generic import RedirectView
 from django.conf.urls.static import static
 from django.conf import settings
-
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 FRONTEND_URL = f"http://{settings.FRONTEND_DOMAIN}/"
 
 urlpatterns = [
@@ -31,4 +31,15 @@ urlpatterns = [
 ]
 
 if settings.DEBUG:
+    # registrar documentação apenas em DEBUG
+    try:
+
+        urlpatterns = [
+            path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
+            path("api/docs/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),
+        ] + urlpatterns
+    except Exception:
+        # drf-spectacular não disponível — ignore
+        pass
+
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

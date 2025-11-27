@@ -148,3 +148,12 @@ Imagem 2: (Tela Principal com a Lista de Tarefas e o Streak)
 
 Imagem 3: (Tela de Edição de Tarefa ou Recuperação de Senha)
 [Insira a Imagem da Tela de Edição aqui]
+
+## Documentação da API (Swagger)
+
+Após instalar dependências e rodar o servidor de desenvolvimento, a documentação automática estará disponível em:
+
+- `http://localhost:8000/api/schema/` — especificação OpenAPI (JSON/YAML)
+- `http://localhost:8000/api/docs/` — Swagger UI interativo
+
+Visite esses endpoints para inspecionar e testar os endpoints da API diretamente pelo navegador.

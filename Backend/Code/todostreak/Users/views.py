@@ -14,6 +14,8 @@ from .models import User
 from .forms import CustomPasswordResetForm
 from .serializers import RegisterSerializer, UserSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
+from .serializers import UserUpdateSerializer
+from rest_framework.permissions import IsAuthenticated
 
 class RegisterUserView(APIView):
     """API endpoint para registrar usuário usando DRF serializer."""
@@ -114,6 +116,29 @@ class UserPasswordResetView(APIView):
             )
         
         return Response(form.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserMeView(APIView):
+    """Retrieve or update the authenticated user's profile."""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        serializer = UserSerializer(request.user, context={"request": request})
+        return Response(serializer.data)
+
+    def put(self, request):
+        serializer = UserUpdateSerializer(request.user, data=request.data, context={"request": request})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def patch(self, request):
+        serializer = UserUpdateSerializer(request.user, data=request.data, partial=True, context={"request": request})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class UserPasswordResetConfirmView(APIView):
     """
