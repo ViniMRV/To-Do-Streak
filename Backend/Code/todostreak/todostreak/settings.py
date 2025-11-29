@@ -187,4 +187,25 @@ SPECTACULAR_SETTINGS = {
     "TITLE": "To-Do Streak API",
     "DESCRIPTION": "API do backend do To-Do Streak (DRF + SimpleJWT)",
     "VERSION": "1.0.0",
+    # adiciona esquema de segurança para permitir o botão 'Authorize' no Swagger UI
+    "COMPONENTS": {
+        "securitySchemes": {
+            "BearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT",
+            }
+            ,
+            "jwtAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT",
+            }
+        }
+    },
+    # Aplica o esquema de segurança globalmente (header Authorization: Bearer <token>)
+    "SECURITY": [{"BearerAuth": []}],
 }
+
+# adicionar também um servidor padrão para facilitar o Swagger UI
+SPECTACULAR_SETTINGS.setdefault("SERVERS", [{"url": "http://localhost:8000", "description": "Development server"}])

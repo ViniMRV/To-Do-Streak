@@ -12,7 +12,16 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from .models import User
 from .forms import CustomPasswordResetForm
-from .serializers import RegisterSerializer, UserSerializer
+from .serializers import (
+    RegisterSerializer,
+    UserSerializer,
+    UserUpdateSerializer,
+    EmailSerializer,
+    PasswordResetConfirmSerializer,
+    TokenObtainPairRequestSerializer,
+    TokenObtainPairResponseSerializer,
+)
+from drf_spectacular.utils import extend_schema
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .serializers import UserUpdateSerializer
 from rest_framework.permissions import IsAuthenticated
@@ -21,6 +30,10 @@ class RegisterUserView(APIView):
     """API endpoint para registrar usuário usando DRF serializer."""
     permission_classes = [AllowAny]
 
+    @extend_schema(
+        request=RegisterSerializer,
+        responses={201: UserSerializer},
+    )
     def post(self, request):
         serializer = RegisterSerializer(data=request.data)
         if serializer.is_valid():
@@ -49,6 +62,7 @@ class ActivateUserView(APIView):
     """Ativa conta do usuário a partir do token de ativação."""
     permission_classes = [AllowAny]
 
+    @extend_schema()
     def post(self, request, token):
         try:
             user = User.objects.get(activation_token=token)
@@ -63,6 +77,10 @@ class ActivateUserView(APIView):
         user.save()
         return Response({"message": "Conta ativada com sucesso."}, status=status.HTTP_200_OK)
 
+@extend_schema(
+    request=TokenObtainPairRequestSerializer,
+    responses={200: TokenObtainPairResponseSerializer},
+)
 class LoginUserView(TokenObtainPairView):
     """Login que retorna par de tokens (access + refresh) usando SimpleJWT."""
     permission_classes = [AllowAny]
@@ -93,6 +111,7 @@ class UserPasswordResetView(APIView):
     permission_classes = [AllowAny]
     email_template_name = "users/password_reset_email.html" 
 
+    @extend_schema(request=EmailSerializer, responses={200: None})
     def post(self, request):
         form = CustomPasswordResetForm(request.data)
         
@@ -147,6 +166,7 @@ class UserPasswordResetConfirmView(APIView):
 
     permission_classes = [AllowAny]
 
+    @extend_schema(request=PasswordResetConfirmSerializer, responses={200: None})
     def post(self, request, uidb64, token):
         try:
             uid = force_str(urlsafe_base64_decode(uidb64))

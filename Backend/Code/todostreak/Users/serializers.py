@@ -36,3 +36,21 @@ class RegisterSerializer(serializers.ModelSerializer):
         user.activation_token = secrets.token_urlsafe(32)
         user.save()
         return user
+
+
+class EmailSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+
+class PasswordResetConfirmSerializer(serializers.Serializer):
+    new_password = serializers.CharField(write_only=True)
+
+
+class TokenObtainPairRequestSerializer(serializers.Serializer):
+    username = serializers.CharField(write_only=True)
+    password = serializers.CharField(write_only=True)
+
+
+class TokenObtainPairResponseSerializer(serializers.Serializer):
+    access = serializers.CharField(read_only=True)
+    refresh = serializers.CharField(read_only=True)

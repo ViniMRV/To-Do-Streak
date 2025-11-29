@@ -22,7 +22,8 @@ from django.http import FileResponse, HttpResponse
 from pathlib import Path
 from django.conf.urls.static import static
 from django.conf import settings
-from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
+from rest_framework.permissions import AllowAny
 FRONTEND_URL = f"http://{settings.FRONTEND_DOMAIN}/"
 
 
@@ -51,10 +52,23 @@ urlpatterns = [
 if settings.DEBUG:
     # registrar documentação apenas em DEBUG
     try:
-
+        # expõe schema e UIs apenas em DEBUG e com permissão pública para facilitar desenvolvimento
         urlpatterns = [
-            path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
-            path("api/docs/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),
+            path(
+                "api/schema/",
+                SpectacularAPIView.as_view(permission_classes=[AllowAny]),
+                name="schema",
+            ),
+            path(
+                "api/docs/",
+                SpectacularSwaggerView.as_view(url_name="schema", permission_classes=[AllowAny]),
+                name="swagger-ui",
+            ),
+            path(
+                "api/redoc/",
+                SpectacularRedocView.as_view(url_name="schema", permission_classes=[AllowAny]),
+                name="redoc",
+            ),
         ] + urlpatterns
     except Exception:
         # drf-spectacular não disponível — ignore

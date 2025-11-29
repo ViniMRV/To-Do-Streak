@@ -153,7 +153,8 @@ Imagem 3: (Tela de Edição de Tarefa ou Recuperação de Senha)
 
 Após instalar dependências e rodar o servidor de desenvolvimento, a documentação automática estará disponível em:
 
-- `http://localhost:8000/api/schema/` — especificação OpenAPI (JSON/YAML)
-- `http://localhost:8000/api/docs/` — Swagger UI interativo
+- Especificação OpenAPI (JSON/YAML): [http://localhost:8000/api/schema/](http://localhost:8000/api/schema/)
+- Swagger UI (interativo): [http://localhost:8000/api/docs/](http://localhost:8000/api/docs/)
+- Redoc (alternativa): [http://localhost:8000/api/redoc/](http://localhost:8000/api/redoc/)
 
-Visite esses endpoints para inspecionar e testar os endpoints da API diretamente pelo navegador.
+Visite esses links para inspecionar e testar os endpoints da API diretamente pelo navegador. Use o botão **Authorize** na Swagger UI para fornecer um token `Bearer <access_token>` e testar endpoints protegidos.
