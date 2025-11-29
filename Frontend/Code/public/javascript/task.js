@@ -20,26 +20,33 @@ window.onload = () => __awaiter(void 0, void 0, void 0, function* () {
         const resp = yield fetch(`${API_URL}/lists/items/${id}/`, { headers: getAuthHeaders() });
         if (resp.ok) {
             const data = yield resp.json();
-            titleInput.value = data.text;
+            titleInput.value = data.text; // Field is 'text'
         }
     }
     form.addEventListener('submit', (e) => __awaiter(void 0, void 0, void 0, function* () {
         e.preventDefault();
         let listId = localStorage.getItem('current_list_id');
         if (!id && !listId) {
-            const listResp = yield fetch(`${API_URL}/lists/`, {
-                method: 'POST',
-                headers: getAuthHeaders(),
-                body: JSON.stringify({ title: "Minha Lista" })
-            });
-            const newList = yield listResp.json();
-            listId = newList.id.toString();
-            localStorage.setItem('current_list_id', listId);
+            try {
+                const listResp = yield fetch(`${API_URL}/lists/`, {
+                    method: 'POST',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify({ title: "Minha Lista" })
+                });
+                if (listResp.ok) {
+                    const newList = yield listResp.json();
+                    listId = newList.id.toString();
+                    localStorage.setItem('current_list_id', listId);
+                }
+            }
+            catch (err) {
+                console.error("Error creating default list", err);
+            }
         }
         const method = id ? 'PATCH' : 'POST';
         const url = id ? `${API_URL}/lists/items/${id}/` : `${API_URL}/lists/items/`;
         const payload = { text: titleInput.value };
-        if (!id) {
+        if (!id && listId) {
             payload.todo_list = parseInt(listId);
         }
         const response = yield fetch(url, {
@@ -52,7 +59,8 @@ window.onload = () => __awaiter(void 0, void 0, void 0, function* () {
         }
         else {
             const err = yield response.json();
-            alert('Error saving task: ' + JSON.stringify(err));
+            console.error(err);
+            alert('Erro ao salvar tarefa: ' + JSON.stringify(err));
         }
     }));
 });

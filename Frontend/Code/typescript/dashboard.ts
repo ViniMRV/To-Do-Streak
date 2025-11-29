@@ -4,7 +4,7 @@ interface Item {
     id: number;
     text: string;
     done: boolean;
-    todo_list: number;
+    order: number;
 }
 
 interface ToDoList {
@@ -43,7 +43,7 @@ async function loadDashboard() {
             listElement.innerHTML = '';
 
             if (lists.length === 0) {
-                listElement.innerHTML = '<li>No lists found. Please create a task to start!</li>';
+                listElement.innerHTML = '<li>Nenhuma lista encontrada. Crie uma tarefa para começar!</li>';
                 return;
             }
 
@@ -52,7 +52,7 @@ async function loadDashboard() {
             localStorage.setItem('current_list_id', mainList.id.toString());
 
             if (mainList.items.length === 0) {
-                listElement.innerHTML = '<li style="justify-content:center; color:#888;">No tasks yet. Enjoy your day! ☀️</li>';
+                listElement.innerHTML = '<li style="justify-content:center; color:#888;">Nenhuma tarefa pendente. Aproveite o dia! ☀️</li>';
             }
 
             mainList.items.forEach(item => {
@@ -86,6 +86,8 @@ async function loadDashboard() {
 
     } catch (error) {
         console.error(error);
+        const listElement = document.getElementById('taskList');
+        if (listElement) listElement.innerHTML = '<li style="color:red">Erro ao carregar dados.</li>';
     }
 }
 
@@ -96,14 +98,15 @@ async function toggleItem(item: Item) {
             headers: getAuthHeaders(),
             body: JSON.stringify({ done: !item.done })
         });
-        loadDashboard();
+        loadDashboard(); // Reload to update UI
     } catch (error) {
         console.error('Error toggling item:', error);
+        alert('Erro ao atualizar tarefa.');
     }
 }
 
 async function deleteItem(id: number) {
-    if(!confirm("Are you sure?")) return;
+    if(!confirm("Tem certeza que deseja excluir?")) return;
     try {
         await fetch(`${API_URL}/lists/items/${id}/`, {
             method: 'DELETE',
@@ -112,6 +115,7 @@ async function deleteItem(id: number) {
         loadDashboard();
     } catch (error) {
         console.error('Error deleting item:', error);
+        alert('Erro ao excluir tarefa.');
     }
 }
 

@@ -13,33 +13,33 @@ window.onload = () => {
     const registerForm = document.getElementById('registerForm');
     if (loginForm) {
         loginForm.addEventListener('submit', (e) => __awaiter(void 0, void 0, void 0, function* () {
+            var _a;
             e.preventDefault();
             const email = document.getElementById('email').value;
+            const username = ((_a = document.getElementById('username')) === null || _a === void 0 ? void 0 : _a.value) || email;
             const password = document.getElementById('password').value;
             const btn = loginForm.querySelector('button');
             try {
                 btn.disabled = true;
-                btn.innerText = 'Signing in...';
+                btn.innerText = 'Entrando...';
                 const response = yield fetch(`${API_URL}/users/login/`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username: email, password: password })
+                    body: JSON.stringify({ username: username, password: password })
                 });
                 if (response.ok) {
                     const data = yield response.json();
-                    // Save JWT tokens
                     localStorage.setItem('access_token', data.access);
                     localStorage.setItem('refresh_token', data.refresh);
-                    // Redirect to Dashboard
                     window.location.href = 'index.html';
                 }
                 else {
-                    alert('Login failed! Please check your credentials.');
+                    alert('Falha no login! Verifique suas credenciais.');
                 }
             }
             catch (error) {
                 console.error(error);
-                alert('Connection error.');
+                alert('Erro de conexão com o servidor.');
             }
             finally {
                 btn.disabled = false;
@@ -50,40 +50,43 @@ window.onload = () => {
     if (registerForm) {
         registerForm.addEventListener('submit', (e) => __awaiter(void 0, void 0, void 0, function* () {
             e.preventDefault();
-            const name = document.getElementById('name').value;
+            const username = document.getElementById('username').value;
+            const firstName = document.getElementById('firstName').value;
+            const lastName = document.getElementById('lastName').value;
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
             const btn = registerForm.querySelector('button');
             if (password !== confirmPassword) {
-                alert('Passwords do not match!');
+                alert('As senhas não coincidem!');
                 return;
             }
             try {
                 btn.disabled = true;
-                btn.innerText = 'Creating account...';
+                btn.innerText = 'Criando conta...';
                 const response = yield fetch(`${API_URL}/users/register/`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        first_name: name,
-                        username: email,
+                        username: username,
+                        first_name: firstName,
+                        last_name: lastName,
                         email: email,
                         password: password
                     })
                 });
                 if (response.ok) {
-                    alert('Account created successfully! Please login.');
+                    alert('Conta criada com sucesso! Verifique seu e-mail para ativar ou faça login.');
                     window.location.href = 'login.html';
                 }
                 else {
                     const data = yield response.json();
-                    alert('Error creating account: ' + JSON.stringify(data));
+                    alert('Erro ao criar conta: ' + JSON.stringify(data));
                 }
             }
             catch (error) {
                 console.error(error);
-                alert('Connection error.');
+                alert('Erro de conexão.');
             }
             finally {
                 btn.disabled = false;

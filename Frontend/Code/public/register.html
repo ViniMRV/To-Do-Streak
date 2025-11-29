@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,13 +9,24 @@
     <script type="module" src="javascript/auth.js"></script>
 </head>
 <body>
-    <div class="container auth-container">
+    <div class="container auth-container" style="max-width: 500px;">
         <a href="#" class="auth-logo">To-Do Streak 🔥</a>
         <p class="auth-subtitle">Crie sua conta e comece seu streak!</p>
 
         <form id="registerForm">
-            <label for="name" style="text-align: left;">Nome</label>
-            <input type="text" id="name" name="name" required placeholder="Como quer ser chamado?">
+            <label for="username" style="text-align: left;">Usuário</label>
+            <input type="text" id="username" name="username" required placeholder="Escolha um nome de usuário único">
+
+            <div style="display: flex; gap: 10px;">
+                <div style="flex: 1;">
+                    <label for="firstName" style="text-align: left;">Nome</label>
+                    <input type="text" id="firstName" name="firstName" required placeholder="Seu nome">
+                </div>
+                <div style="flex: 1;">
+                    <label for="lastName" style="text-align: left;">Sobrenome</label>
+                    <input type="text" id="lastName" name="lastName" required placeholder="Seu sobrenome">
+                </div>
+            </div>
 
             <label for="email" style="text-align: left;">E-mail</label>
             <input type="email" id="email" name="email" required placeholder="seu@email.com">

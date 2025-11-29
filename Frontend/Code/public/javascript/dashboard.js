@@ -30,13 +30,13 @@ function loadDashboard() {
             if (listElement) {
                 listElement.innerHTML = '';
                 if (lists.length === 0) {
-                    listElement.innerHTML = '<li>No lists found. Please create a task to start!</li>';
+                    listElement.innerHTML = '<li>Nenhuma lista encontrada. Crie uma tarefa para começar!</li>';
                     return;
                 }
                 const mainList = lists[0];
                 localStorage.setItem('current_list_id', mainList.id.toString());
                 if (mainList.items.length === 0) {
-                    listElement.innerHTML = '<li style="justify-content:center; color:#888;">No tasks yet. Enjoy your day! ☀️</li>';
+                    listElement.innerHTML = '<li style="justify-content:center; color:#888;">Nenhuma tarefa pendente. Aproveite o dia! ☀️</li>';
                 }
                 mainList.items.forEach(item => {
                     const li = document.createElement('li');
@@ -64,6 +64,9 @@ function loadDashboard() {
         }
         catch (error) {
             console.error(error);
+            const listElement = document.getElementById('taskList');
+            if (listElement)
+                listElement.innerHTML = '<li style="color:red">Erro ao carregar dados.</li>';
         }
     });
 }
@@ -75,16 +78,17 @@ function toggleItem(item) {
                 headers: getAuthHeaders(),
                 body: JSON.stringify({ done: !item.done })
             });
-            loadDashboard();
+            loadDashboard(); // Reload to update UI
         }
         catch (error) {
             console.error('Error toggling item:', error);
+            alert('Erro ao atualizar tarefa.');
         }
     });
 }
 function deleteItem(id) {
     return __awaiter(this, void 0, void 0, function* () {
-        if (!confirm("Are you sure?"))
+        if (!confirm("Tem certeza que deseja excluir?"))
             return;
         try {
             yield fetch(`${API_URL}/lists/items/${id}/`, {
@@ -95,6 +99,7 @@ function deleteItem(id) {
         }
         catch (error) {
             console.error('Error deleting item:', error);
+            alert('Erro ao excluir tarefa.');
         }
     });
 }

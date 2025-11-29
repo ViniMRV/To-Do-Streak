@@ -4,7 +4,6 @@ export function getAuthHeaders(): HeadersInit {
     const token = localStorage.getItem('access_token');
     return {
         'Content-Type': 'application/json',
-        // JWT requires 'Bearer' prefix
         'Authorization': token ? `Bearer ${token}` : ''
     };
 }
