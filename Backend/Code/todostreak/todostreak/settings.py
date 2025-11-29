@@ -32,6 +32,8 @@ ALLOWED_HOSTS = [
     ".github.dev",
 ]
 
+FRONTEND_DOMAIN = getattr(globals().get('os', __import__('os')).environ, 'get', lambda k, d=None: d)('FRONTEND_DOMAIN', 'localhost:3000')
+
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:8000",
     "https://localhost:8000",

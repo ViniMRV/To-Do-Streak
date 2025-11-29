@@ -18,14 +18,32 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.views.generic import RedirectView
+from django.http import FileResponse, HttpResponse
+from pathlib import Path
 from django.conf.urls.static import static
 from django.conf import settings
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 FRONTEND_URL = f"http://{settings.FRONTEND_DOMAIN}/"
 
+
+def serve_frontend_login(request):
+    """Serve the frontend login.html file from Frontend/Code/public when available (DEV only)."""
+    try:
+        # settings.BASE_DIR is Backend/Code/todostreak
+        project_root = Path(settings.BASE_DIR).parent.parent.parent
+        login_path = project_root / "Frontend" / "Code" / "public" / "login.html"
+        if login_path.exists():
+            return FileResponse(open(login_path, "rb"), content_type="text/html")
+        return HttpResponse(
+            "Frontend login page not found. Start frontend server or place login.html in Frontend/Code/public/",
+            status=404,
+        )
+    except Exception as e:
+        return HttpResponse(f"Error serving frontend login: {e}", status=500)
+
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("", RedirectView.as_view(url=FRONTEND_URL, permanent=False), name="home"),
+    path("", serve_frontend_login, name="home") if settings.DEBUG else path("", RedirectView.as_view(url=FRONTEND_URL, permanent=False), name="home"),
     path("users/", include("Users.urls")),
     path("lists/", include("Lists.urls")),
 ]
