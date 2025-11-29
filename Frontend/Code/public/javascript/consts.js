@@ -1,8 +1,9 @@
-export const API_URL = 'http://127.0.0.1:8000/api';
+export const API_URL = 'http://127.0.0.1:8000';
 export function getAuthHeaders() {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('access_token');
     return {
         'Content-Type': 'application/json',
-        'Authorization': token ? `Token ${token}` : ''
+        // JWT requires 'Bearer' prefix
+        'Authorization': token ? `Bearer ${token}` : ''
     };
 }

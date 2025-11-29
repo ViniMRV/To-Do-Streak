@@ -5,35 +5,54 @@ const id = urlParams.get('id');
 
 window.onload = async () => {
     const form = document.getElementById('taskForm') as HTMLFormElement;
-    const tituloInput = document.getElementById('titulo') as HTMLInputElement;
+    const titleInput = document.getElementById('titulo') as HTMLInputElement; 
     const pageTitle = document.getElementById('pageTitle');
 
-    // Se tiver ID
     if (id) {
         if (pageTitle) pageTitle.innerText = 'Editar Tarefa';
-        // Fetch dados atuais
-        const resp = await fetch(`${API_URL}/tarefas/${id}/`, { headers: getAuthHeaders() });
-        const data = await resp.json();
-        tituloInput.value = data.titulo;
+        
+        const resp = await fetch(`${API_URL}/lists/items/${id}/`, { headers: getAuthHeaders() });
+        if (resp.ok) {
+            const data = await resp.json();
+            titleInput.value = data.text; 
+        }
     }
-
-    // Enviar formulário
+    
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         
-        const metodo = id ? 'PUT' : 'POST';
-        const url = id ? `${API_URL}/tarefas/${id}/` : `${API_URL}/tarefas/`;
+        let listId = localStorage.getItem('current_list_id');
+        
+        if (!id && !listId) {
+            const listResp = await fetch(`${API_URL}/lists/`, {
+                method: 'POST',
+                headers: getAuthHeaders(),
+                body: JSON.stringify({ title: "Minha Lista" })
+            });
+            const newList = await listResp.json();
+            listId = newList.id.toString();
+            localStorage.setItem('current_list_id', listId!);
+        }
+
+        const method = id ? 'PATCH' : 'POST';
+        const url = id ? `${API_URL}/lists/items/${id}/` : `${API_URL}/lists/items/`;
+        
+        const payload: any = { text: titleInput.value };
+        if (!id) {
+            payload.todo_list = parseInt(listId!); 
+        }
 
         const response = await fetch(url, {
-            method: metodo,
+            method: method,
             headers: getAuthHeaders(),
-            body: JSON.stringify({ titulo: tituloInput.value })
+            body: JSON.stringify(payload)
         });
 
         if (response.ok) {
             window.location.href = 'index.html';
         } else {
-            alert('Erro ao salvar tarefa');
+            const err = await response.json();
+            alert('Error saving task: ' + JSON.stringify(err));
         }
     });
 };

@@ -11,7 +11,6 @@ import { API_URL } from './consts.js';
 window.onload = () => {
     const loginForm = document.getElementById('loginForm');
     const registerForm = document.getElementById('registerForm');
-    // --- LÓGICA DE LOGIN ---
     if (loginForm) {
         loginForm.addEventListener('submit', (e) => __awaiter(void 0, void 0, void 0, function* () {
             e.preventDefault();
@@ -20,27 +19,27 @@ window.onload = () => {
             const btn = loginForm.querySelector('button');
             try {
                 btn.disabled = true;
-                btn.innerText = 'Entrando...';
-                const response = yield fetch(`${API_URL}/login/`, {
+                btn.innerText = 'Signing in...';
+                const response = yield fetch(`${API_URL}/users/login/`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username: email, password: password })
-                    // Nota: Django User model usa 'username' por padrão, mas pode ser adaptado para email
                 });
                 if (response.ok) {
                     const data = yield response.json();
-                    // Salva o token para usar nas outras requisições
-                    localStorage.setItem('token', data.token);
-                    // Redireciona para a Dashboard
+                    // Save JWT tokens
+                    localStorage.setItem('access_token', data.access);
+                    localStorage.setItem('refresh_token', data.refresh);
+                    // Redirect to Dashboard
                     window.location.href = 'index.html';
                 }
                 else {
-                    alert('Login falhou! Verifique suas credenciais.');
+                    alert('Login failed! Please check your credentials.');
                 }
             }
             catch (error) {
                 console.error(error);
-                alert('Erro de conexão com o servidor.');
+                alert('Connection error.');
             }
             finally {
                 btn.disabled = false;
@@ -48,7 +47,6 @@ window.onload = () => {
             }
         }));
     }
-    // --- LÓGICA DE CADASTRO ---
     if (registerForm) {
         registerForm.addEventListener('submit', (e) => __awaiter(void 0, void 0, void 0, function* () {
             e.preventDefault();
@@ -58,13 +56,13 @@ window.onload = () => {
             const confirmPassword = document.getElementById('confirmPassword').value;
             const btn = registerForm.querySelector('button');
             if (password !== confirmPassword) {
-                alert('As senhas não coincidem!');
+                alert('Passwords do not match!');
                 return;
             }
             try {
                 btn.disabled = true;
-                btn.innerText = 'Criando conta...';
-                const response = yield fetch(`${API_URL}/register/`, {
+                btn.innerText = 'Creating account...';
+                const response = yield fetch(`${API_URL}/users/register/`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -75,17 +73,17 @@ window.onload = () => {
                     })
                 });
                 if (response.ok) {
-                    alert('Conta criada com sucesso! Faça login para continuar.');
+                    alert('Account created successfully! Please login.');
                     window.location.href = 'login.html';
                 }
                 else {
                     const data = yield response.json();
-                    alert('Erro ao criar conta: ' + JSON.stringify(data));
+                    alert('Error creating account: ' + JSON.stringify(data));
                 }
             }
             catch (error) {
                 console.error(error);
-                alert('Erro de conexão.');
+                alert('Connection error.');
             }
             finally {
                 btn.disabled = false;

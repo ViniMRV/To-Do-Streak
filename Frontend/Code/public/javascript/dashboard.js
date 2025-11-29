@@ -8,125 +8,94 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { API_URL, getAuthHeaders } from './consts.js';
-function carregarDashboard() {
+function loadDashboard() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            // Faz a requisição para pegar tarefas e streak
-            // Assumimos que o endpoint '/dashboard/' retorna tudo isso junto
-            const response = yield fetch(`${API_URL}/dashboard/`, {
-                method: 'GET',
+            const userResp = yield fetch(`${API_URL}/users/me/`, {
                 headers: getAuthHeaders()
             });
-            // Se der erro 401 (Não autorizado), o token expirou ou não existe
-            if (response.status === 401) {
-                localStorage.removeItem('token');
+            if (userResp.status === 401) {
                 window.location.href = 'login.html';
                 return;
             }
-            if (!response.ok) {
-                throw new Error('Erro ao carregar dados');
-            }
-            const data = yield response.json();
-            // 1. Atualiza o contador de Streak na tela
+            const userData = yield userResp.json();
             const streakElement = document.getElementById('streakValue');
-            if (streakElement) {
-                streakElement.innerText = data.streak.toString();
-                // Efeito visual simples: muda a cor se tiver streak > 0
-                streakElement.style.color = data.streak > 0 ? '#ff4500' : '#666';
-            }
-            // 2. Renderiza a Lista de Tarefas
-            const lista = document.getElementById('taskList');
-            if (lista) {
-                lista.innerHTML = ''; // Limpa a lista atual antes de redesenhar
-                if (data.tarefas.length === 0) {
-                    lista.innerHTML = '<li style="justify-content:center; color:#888;">Nenhuma tarefa pendente. Aproveite o dia! ☀️</li>';
+            if (streakElement)
+                streakElement.innerText = userData.streak_count.toString();
+            const listsResp = yield fetch(`${API_URL}/lists/`, {
+                headers: getAuthHeaders()
+            });
+            const lists = yield listsResp.json();
+            const listElement = document.getElementById('taskList');
+            if (listElement) {
+                listElement.innerHTML = '';
+                if (lists.length === 0) {
+                    listElement.innerHTML = '<li>No lists found. Please create a task to start!</li>';
                     return;
                 }
-                data.tarefas.forEach(tarefa => {
+                const mainList = lists[0];
+                localStorage.setItem('current_list_id', mainList.id.toString());
+                if (mainList.items.length === 0) {
+                    listElement.innerHTML = '<li style="justify-content:center; color:#888;">No tasks yet. Enjoy your day! ☀️</li>';
+                }
+                mainList.items.forEach(item => {
                     const li = document.createElement('li');
-                    // Adiciona classe CSS 'done' se a tarefa estiver concluída (para riscar o texto)
-                    if (tarefa.concluida) {
+                    if (item.done)
                         li.classList.add('done');
-                    }
-                    // Checkbox para marcar como feito
                     const checkbox = document.createElement('input');
                     checkbox.type = 'checkbox';
-                    checkbox.checked = tarefa.concluida;
-                    // Ao clicar, chama a função de toggle
-                    checkbox.onclick = () => toggleTarefa(tarefa.id);
-                    // Texto da Tarefa
+                    checkbox.checked = item.done;
+                    checkbox.onclick = () => toggleItem(item);
                     const span = document.createElement('span');
-                    span.innerText = tarefa.titulo;
-                    // Grupo de Ações (Botões)
+                    span.innerText = item.text;
                     const actionsDiv = document.createElement('div');
                     actionsDiv.className = 'task-actions';
-                    // Botão Editar (Redireciona para task.html com ID)
                     const btnEdit = document.createElement('a');
                     btnEdit.innerText = '✏️';
-                    btnEdit.href = `task.html?id=${tarefa.id}`;
-                    btnEdit.title = "Editar";
-                    // Botão Excluir
+                    btnEdit.href = `task.html?id=${item.id}`;
                     const btnDel = document.createElement('button');
                     btnDel.innerText = '🗑️';
-                    btnDel.title = "Excluir";
-                    btnDel.onclick = () => deletarTarefa(tarefa.id);
+                    btnDel.onclick = () => deleteItem(item.id);
                     actionsDiv.append(btnEdit, btnDel);
                     li.append(checkbox, span, actionsDiv);
-                    lista.appendChild(li);
+                    listElement.appendChild(li);
                 });
             }
         }
         catch (error) {
-            console.error('Erro no dashboard:', error);
-            const lista = document.getElementById('taskList');
-            if (lista)
-                lista.innerHTML = '<li style="color:red;">Erro ao carregar tarefas. Verifique a conexão.</li>';
-        }
-    });
-}
-// Função para Marcar/Desmarcar Tarefa
-function toggleTarefa(id) {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const response = yield fetch(`${API_URL}/tarefas/${id}/toggle/`, {
-                method: 'POST',
-                headers: getAuthHeaders()
-            });
-            if (response.ok) {
-                // Recarrega o dashboard para atualizar o Streak e a ordenação
-                carregarDashboard();
-            }
-            else {
-                alert('Não foi possível atualizar a tarefa.');
-            }
-        }
-        catch (error) {
             console.error(error);
         }
     });
 }
-// Função para Deletar Tarefa
-function deletarTarefa(id) {
+function toggleItem(item) {
     return __awaiter(this, void 0, void 0, function* () {
-        if (!confirm("Tem certeza que deseja excluir esta tarefa?"))
+        try {
+            yield fetch(`${API_URL}/lists/items/${item.id}/`, {
+                method: 'PATCH',
+                headers: getAuthHeaders(),
+                body: JSON.stringify({ done: !item.done })
+            });
+            loadDashboard();
+        }
+        catch (error) {
+            console.error('Error toggling item:', error);
+        }
+    });
+}
+function deleteItem(id) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (!confirm("Are you sure?"))
             return;
         try {
-            const response = yield fetch(`${API_URL}/tarefas/${id}/`, {
+            yield fetch(`${API_URL}/lists/items/${id}/`, {
                 method: 'DELETE',
                 headers: getAuthHeaders()
             });
-            if (response.ok) {
-                carregarDashboard(); // Atualiza a lista
-            }
-            else {
-                alert('Erro ao excluir tarefa.');
-            }
+            loadDashboard();
         }
         catch (error) {
-            console.error(error);
-            alert('Erro de conexão.');
+            console.error('Error deleting item:', error);
         }
     });
 }
-// Inicializa o dashboard quando a página carregar
-window.onload = carregarDashboard;
+window.onload = loadDashboard;

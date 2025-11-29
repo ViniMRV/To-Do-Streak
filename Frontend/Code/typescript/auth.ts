@@ -4,7 +4,6 @@ window.onload = () => {
     const loginForm = document.getElementById('loginForm') as HTMLFormElement;
     const registerForm = document.getElementById('registerForm') as HTMLFormElement;
 
-    // --- LÓGICA DE LOGIN ---
     if (loginForm) {
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -14,27 +13,27 @@ window.onload = () => {
 
             try {
                 btn.disabled = true;
-                btn.innerText = 'Entrando...';
+                btn.innerText = 'Signing in...';
 
-                const response = await fetch(`${API_URL}/login/`, { // Ajuste a rota conforme seu backend
+                const response = await fetch(`${API_URL}/users/login/`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username: email, password: password }) 
-                    // Nota: Django User model usa 'username' por padrão, mas pode ser adaptado para email
                 });
 
                 if (response.ok) {
                     const data = await response.json();
-                    // Salva o token para usar nas outras requisições
-                    localStorage.setItem('token', data.token);
-                    // Redireciona para a Dashboard
+                    // Save JWT tokens
+                    localStorage.setItem('access_token', data.access);
+                    localStorage.setItem('refresh_token', data.refresh);
+                    // Redirect to Dashboard
                     window.location.href = 'index.html';
                 } else {
-                    alert('Login falhou! Verifique suas credenciais.');
+                    alert('Login failed! Please check your credentials.');
                 }
             } catch (error) {
                 console.error(error);
-                alert('Erro de conexão com o servidor.');
+                alert('Connection error.');
             } finally {
                 btn.disabled = false;
                 btn.innerText = 'Entrar';
@@ -42,7 +41,6 @@ window.onload = () => {
         });
     }
 
-    // --- LÓGICA DE CADASTRO ---
     if (registerForm) {
         registerForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -53,15 +51,15 @@ window.onload = () => {
             const btn = registerForm.querySelector('button') as HTMLButtonElement;
 
             if (password !== confirmPassword) {
-                alert('As senhas não coincidem!');
+                alert('Passwords do not match!');
                 return;
             }
 
             try {
                 btn.disabled = true;
-                btn.innerText = 'Criando conta...';
+                btn.innerText = 'Creating account...';
 
-                const response = await fetch(`${API_URL}/register/`, {
+                const response = await fetch(`${API_URL}/users/register/`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
@@ -73,15 +71,15 @@ window.onload = () => {
                 });
 
                 if (response.ok) {
-                    alert('Conta criada com sucesso! Faça login para continuar.');
+                    alert('Account created successfully! Please login.');
                     window.location.href = 'login.html';
                 } else {
                     const data = await response.json();
-                    alert('Erro ao criar conta: ' + JSON.stringify(data));
+                    alert('Error creating account: ' + JSON.stringify(data));
                 }
             } catch (error) {
                 console.error(error);
-                alert('Erro de conexão.');
+                alert('Connection error.');
             } finally {
                 btn.disabled = false;
                 btn.innerText = 'Criar Conta';
