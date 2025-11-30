@@ -1,4 +1,4 @@
-export const API_URL = 'http://127.0.0.1:8000';
+export const API_URL = 'https://potential-carnival-7vvqg5j99qx9fxxqv-8000.app.github.dev/';
 export function getAuthHeaders() {
     const token = localStorage.getItem('access_token');
     return {
