@@ -48,11 +48,10 @@ class RegisterUserView(APIView):
                     f'Olá!\n\nClique no link para ativar sua conta: {activation_link}',
                     getattr(settings, 'DEFAULT_FROM_EMAIL', None),
                     [user.email],
-                    fail_silently=True,
+                    fail_silently=False,
                 )
-            except Exception:
-                # don't block registration if email sending fails in dev
-                pass
+            except Exception as e:
+                print(f"Exception on register {e}")
 
             return Response(UserSerializer(user).data, status=status.HTTP_201_CREATED)
 
