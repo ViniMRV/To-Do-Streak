@@ -8,8 +8,8 @@ window.onload = () => {
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            const usernameInput = document.getElementById('username') as HTMLInputElement;
-            const username = usernameInput.value;
+            const emailInput = document.getElementById('email') as HTMLInputElement;
+            const email = emailInput.value;
             
             const password = (document.getElementById('password') as HTMLInputElement).value;
             const btn = loginForm.querySelector('button') as HTMLButtonElement;
@@ -21,7 +21,7 @@ window.onload = () => {
                 const response = await fetch(`${API_URL}/users/login/`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username: username, password: password }) 
+                    body: JSON.stringify({ email: email, password: password }) 
                 });
 
                 if (response.ok) {
@@ -30,7 +30,9 @@ window.onload = () => {
                     localStorage.setItem('refresh_token', data.refresh);
                     window.location.href = 'index.html';
                 } else {
-                    alert('Falha no login! Verifique suas credenciais.');
+                    const errorData = await response.json();
+                    alert(errorData.detail || 'Falha no login! Verifique suas credenciais.');
+                    //alert('Falha no login! Verifique suas credenciais.');
                 }
             } catch (error) {
                 console.error(error);

@@ -10,11 +10,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import { API_URL, getAuthHeaders } from './consts.js';
 function loadDashboard() {
     return __awaiter(this, void 0, void 0, function* () {
+        const token = localStorage.getItem('access_token');
+        if (!token) {
+            window.location.href = 'login.html';
+            return;
+        }
         try {
             const userResp = yield fetch(`${API_URL}/users/me/`, {
                 headers: getAuthHeaders()
             });
             if (userResp.status === 401) {
+                localStorage.removeItem('access_token');
                 window.location.href = 'login.html';
                 return;
             }

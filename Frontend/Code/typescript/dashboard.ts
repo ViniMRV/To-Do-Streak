@@ -19,12 +19,19 @@ interface UserData {
 }
 
 async function loadDashboard() {
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+        window.location.href = 'login.html';
+        return;
+    }
+    
     try {
         const userResp = await fetch(`${API_URL}/users/me/`, {
             headers: getAuthHeaders()
         });
         
         if (userResp.status === 401) {
+            localStorage.removeItem('access_token');
             window.location.href = 'login.html';
             return;
         }

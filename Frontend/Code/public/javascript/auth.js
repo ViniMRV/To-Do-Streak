@@ -14,8 +14,8 @@ window.onload = () => {
     if (loginForm) {
         loginForm.addEventListener('submit', (e) => __awaiter(void 0, void 0, void 0, function* () {
             e.preventDefault();
-            const usernameInput = document.getElementById('username');
-            const username = usernameInput.value;
+            const emailInput = document.getElementById('email');
+            const email = emailInput.value;
             const password = document.getElementById('password').value;
             const btn = loginForm.querySelector('button');
             try {
@@ -24,7 +24,7 @@ window.onload = () => {
                 const response = yield fetch(`${API_URL}/users/login/`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username: username, password: password })
+                    body: JSON.stringify({ email: email, password: password })
                 });
                 if (response.ok) {
                     const data = yield response.json();
@@ -33,7 +33,9 @@ window.onload = () => {
                     window.location.href = 'index.html';
                 }
                 else {
-                    alert('Falha no login! Verifique suas credenciais.');
+                    const errorData = yield response.json();
+                    alert(errorData.detail || 'Falha no login! Verifique suas credenciais.');
+                    //alert('Falha no login! Verifique suas credenciais.');
                 }
             }
             catch (error) {

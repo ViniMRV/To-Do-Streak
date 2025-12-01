@@ -1,4 +1,5 @@
 import traceback
+import os
 from django.conf import settings
 from django.core.mail import send_mail
 from django.utils.http import urlsafe_base64_decode
@@ -24,8 +25,7 @@ from .serializers import (
 )
 from drf_spectacular.utils import extend_schema
 from rest_framework_simplejwt.views import TokenObtainPairView
-from .serializers import UserUpdateSerializer
-from rest_framework.permissions import IsAuthenticated
+from .serializers import UserUpdateSerializer, EmailTokenObtainPairSerializer
 
 class RegisterUserView(APIView):
     """API endpoint para registrar usuário usando DRF serializer."""
@@ -40,8 +40,13 @@ class RegisterUserView(APIView):
         if serializer.is_valid():
             user = serializer.save()
 
-            backend_domain = 'potential-carnival-7vvqg5j99qx9fxxqv-8000.app.github.dev'
-            activation_link = f"https://{backend_domain}/users/activate/{user.activation_token}/"
+            # --- CORREÇÃO: URL DO SEU CODESPACE ---
+            # Isso garante que o link no e-mail abra no lugar certo (público)
+            backend_domain = "vigilant-train-q7v45w55xxqj39xp7-8000.app.github.dev"
+            protocol = "https"
+            
+            activation_link = f"{protocol}://{backend_domain}/users/activate/{user.activation_token}/"
+            # --------------------------------------
 
             try:                
                 send_mail(
@@ -51,7 +56,7 @@ class RegisterUserView(APIView):
                     [user.email],
                     fail_silently=False,
                 )
-                print("Email enviado com sucesso!")
+                print(f"EMAIL ENVIADO! Link gerado: {activation_link}")
             except Exception as e:
                 print("ERRO DE ENVIO DETALHADO:")
                 traceback.print_exc()
@@ -65,7 +70,7 @@ class ActivateUserView(APIView):
     permission_classes = [AllowAny]
 
     @extend_schema()
-    def get(self, request, token): # MUDAR DE 'post' PARA 'get'
+    def get(self, request, token):
         try:
             user = User.objects.get(activation_token=token)
         except User.DoesNotExist:
@@ -75,20 +80,29 @@ class ActivateUserView(APIView):
             user.is_active = True
             user.activation_token = None
             user.save()
+            print(f"CONTA ATIVADA COM SUCESSO: {user.email}") # Log no terminal
+        else:
+             print(f"CONTA JÁ ESTAVA ATIVA: {user.email}")
         
-        # SUCESSO: Redireciona o usuário para a tela de Login do Frontend
-        # Pega o domínio do front configurado no settings
-        frontend = getattr(settings, 'FRONTEND_DOMAIN', 'localhost:8080')
-        # Garante o protocolo https
-        return redirect(f"https://{frontend}/login.html")
+        # Redirecionamento dinâmico para o Frontend (Porta 8080)
+        # Tenta pegar o host atual (que é 8000) e mudar para 8080
+        backend_host = request.get_host()
+        if '8000' in backend_host:
+            frontend = backend_host.replace('8000', '8080')
+        else:
+            frontend = getattr(settings, 'FRONTEND_DOMAIN', 'localhost:8080')
+            
+        protocol = "https" if request.is_secure() else "http"
+        return redirect(f"{protocol}://{frontend}/login.html")
 
 @extend_schema(
     request=TokenObtainPairRequestSerializer,
     responses={200: TokenObtainPairResponseSerializer},
 )
 class LoginUserView(TokenObtainPairView):
-    """Login que retorna par de tokens (access + refresh) usando SimpleJWT."""
+    """Login que retorna par de tokens (access + refresh) usando SimpleJWT e E-mail."""
     permission_classes = [AllowAny]
+    serializer_class = EmailTokenObtainPairSerializer
   
 class LogoutUserView(APIView):
     """Logout para JWT: recebe refresh token e adiciona à blacklist."""
@@ -121,14 +135,18 @@ class UserPasswordResetView(APIView):
         form = CustomPasswordResetForm(request.data)
         
         if form.is_valid():
-            frontend_domain = getattr(settings, 'FRONTEND_DOMAIN', 'localhost:3000')
+            # Mesma lógica dinâmica para o link de reset de senha
+            host = request.get_host()
+            if '8000' in host:
+                frontend_domain = host.replace('8000', '8080')
+            else:
+                frontend_domain = getattr(settings, 'FRONTEND_DOMAIN', 'localhost:8080')
 
             opts = {
                 'use_https': request.is_secure(),
                 'from_email': getattr(settings, 'DEFAULT_FROM_EMAIL'),
                 'email_template_name': self.email_template_name,
                 'request': request,
-                # Isso força o link a ser gerado com o endereço do front
                 'domain_override': frontend_domain, 
             }
 
@@ -199,4 +217,3 @@ class UserPasswordResetConfirmView(APIView):
                 {"error": "Link inválido."},
                 status=status.HTTP_400_BAD_REQUEST
             )
-
