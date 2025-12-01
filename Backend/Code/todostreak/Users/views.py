@@ -1,9 +1,10 @@
-import secrets
+import traceback
 from django.conf import settings
 from django.core.mail import send_mail
 from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import force_str
 from django.contrib.auth.tokens import default_token_generator
+from django.shortcuts import redirect
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -39,10 +40,10 @@ class RegisterUserView(APIView):
         if serializer.is_valid():
             user = serializer.save()
 
-            frontend_domain = getattr(settings, 'FRONTEND_DOMAIN', 'localhost:3000')
-            activation_link = f"http://{frontend_domain}/ativar-conta/{user.activation_token}/"
+            backend_domain = 'potential-carnival-7vvqg5j99qx9fxxqv-8000.app.github.dev'
+            activation_link = f"https://{backend_domain}/users/activate/{user.activation_token}/"
 
-            try:
+            try:                
                 send_mail(
                     'Ative sua conta',
                     f'Olá!\n\nClique no link para ativar sua conta: {activation_link}',
@@ -50,8 +51,10 @@ class RegisterUserView(APIView):
                     [user.email],
                     fail_silently=False,
                 )
+                print("Email enviado com sucesso!")
             except Exception as e:
-                print(f"Exception on register {e}")
+                print("ERRO DE ENVIO DETALHADO:")
+                traceback.print_exc()
 
             return Response(UserSerializer(user).data, status=status.HTTP_201_CREATED)
 
@@ -62,19 +65,22 @@ class ActivateUserView(APIView):
     permission_classes = [AllowAny]
 
     @extend_schema()
-    def post(self, request, token):
+    def get(self, request, token): # MUDAR DE 'post' PARA 'get'
         try:
             user = User.objects.get(activation_token=token)
         except User.DoesNotExist:
             return Response({"error": "Token inválido."}, status=status.HTTP_400_BAD_REQUEST)
 
-        if user.is_active:
-            return Response({"message": "Conta já ativa."}, status=status.HTTP_200_OK)
-
-        user.is_active = True
-        user.activation_token = None
-        user.save()
-        return Response({"message": "Conta ativada com sucesso."}, status=status.HTTP_200_OK)
+        if not user.is_active:
+            user.is_active = True
+            user.activation_token = None
+            user.save()
+        
+        # SUCESSO: Redireciona o usuário para a tela de Login do Frontend
+        # Pega o domínio do front configurado no settings
+        frontend = getattr(settings, 'FRONTEND_DOMAIN', 'localhost:8080')
+        # Garante o protocolo https
+        return redirect(f"https://{frontend}/login.html")
 
 @extend_schema(
     request=TokenObtainPairRequestSerializer,

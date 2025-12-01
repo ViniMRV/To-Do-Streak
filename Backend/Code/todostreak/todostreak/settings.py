@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
 load_dotenv(os.path.join(BASE_DIR.parent.parent, '.env'))
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -54,7 +55,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "todostreak.urls"
 
-FRONTEND_DOMAIN = os.environ.get("FRONTEND_DOMAIN", "localhost:3000")
+FRONTEND_DOMAIN = "potential-carnival-7vvqg5j99qx9fxxqv-8080.app.github.dev"
 
 CORS_ALLOW_CREDENTIALS = True  
 
@@ -167,11 +168,21 @@ SPECTACULAR_SETTINGS = {
 
 SPECTACULAR_SETTINGS.setdefault("SERVERS", [{"url": "http://localhost:8000", "description": "Development server"}])
 
-# --- CONFIGURAÇÃO DE EMAIL (GMAIL SMTP)
+# Configurações de E-mail (Gmail SMTP)
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = os.environ.get('EMAIL_HOST')
-EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 587))
-EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS') == 'True'
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
-DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL')
+
+# O os.getenv tenta ler do .env, se falhar (None), usa o segundo valor como padrão
+EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
+EMAIL_PORT = int(os.getenv('EMAIL_PORT', 587))
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', 'quiz4funemailsender@gmail.com')
+
+# A senha com espaços PRECISA estar correta aqui
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', 'eawq mygk cngy yldz')
+
+# Tratamento do booleano (True/False)
+EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True') == 'True'
+
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'Quiz4Fun <quiz4funemailsender@gmail.com>')
+
+# Debug: Mostrar erros no terminal em vez de silenciar
+EMAIL_FAIL_SILENTLY = False
