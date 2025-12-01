@@ -13,6 +13,7 @@ class IsOwner(permissions.BasePermission):
 class ListViewSet(viewsets.ModelViewSet):
 	serializer_class = ListSerializer
 	permission_classes = [permissions.IsAuthenticated]
+	lookup_value_regex = r'\d+'
 
 	def get_queryset(self):
 		# only lists owned by request.user

@@ -5,8 +5,7 @@ from .models import List, Item
 class ItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = Item
-        fields = ("id", "text", "done", "order", "completed_at")
-
+        fields = ("id", "text", "done", "order", "completed_at", "todo_list")
 
 class ListSerializer(serializers.ModelSerializer):
     items = ItemSerializer(many=True, required=False)
@@ -18,12 +17,13 @@ class ListSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         items_data = validated_data.pop("items", [])
-        request = self.context.get("request")
-        owner = request.user if request else None
+
+        
         if not validated_data.get("title"):
-            # default title if empty
             validated_data["title"] = "lista"
-        lst = List.objects.create(owner=owner, **validated_data)
+            
+        lst = List.objects.create(**validated_data)
+        
         for idx, item in enumerate(items_data):
             Item.objects.create(todo_list=lst, order=item.get("order", idx), text=item.get("text", ""), done=item.get("done", False))
         return lst
@@ -37,7 +37,6 @@ class ListSerializer(serializers.ModelSerializer):
         instance.save()
 
         if items_data is not None:
-            # simple approach: clear existing items and recreate from payload
             instance.items.all().delete()
             for idx, item in enumerate(items_data):
                 Item.objects.create(todo_list=instance, order=item.get("order", idx), text=item.get("text", ""), done=item.get("done", False))
