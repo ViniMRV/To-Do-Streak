@@ -13,10 +13,9 @@ window.onload = () => {
     const registerForm = document.getElementById('registerForm');
     if (loginForm) {
         loginForm.addEventListener('submit', (e) => __awaiter(void 0, void 0, void 0, function* () {
-            var _a;
             e.preventDefault();
-            const email = document.getElementById('email').value;
-            const username = ((_a = document.getElementById('username')) === null || _a === void 0 ? void 0 : _a.value) || email;
+            const usernameInput = document.getElementById('username');
+            const username = usernameInput.value;
             const password = document.getElementById('password').value;
             const btn = loginForm.querySelector('button');
             try {

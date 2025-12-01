@@ -7,8 +7,10 @@ window.onload = () => {
     if (loginForm) {
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const email = (document.getElementById('email') as HTMLInputElement).value;
-            const username = (document.getElementById('username') as HTMLInputElement)?.value || email; 
+            
+            const usernameInput = document.getElementById('username') as HTMLInputElement;
+            const username = usernameInput.value;
+            
             const password = (document.getElementById('password') as HTMLInputElement).value;
             const btn = loginForm.querySelector('button') as HTMLButtonElement;
 
