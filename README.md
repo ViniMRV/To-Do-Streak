@@ -50,19 +50,41 @@ Documentação da API: Swagger / OpenAPI (integrado ao DRF)
 Autenticação: Sistema de autenticação do Django (Tokens ou Sessão)
 Infraestrutura: Docker & Docker Compose
 
-## Como Usar (Docker)
+Esta seção detalha como rodar a aplicação utilizando as imagens Docker pré-construídas e publicadas no Hub sob o usuário **flipq**.
+
 ### Pré-requisitos:
-Docker
-Docker Compose
 
-### Passo a Passo (Docker Compose)
-Para rodar a aplicação completa (Backend + Frontend) utilizando as imagens publicadas:
+* Docker
+* Docker Compose
 
-1. Crie um arquivo chamado `docker-compose.yml` na raiz de uma pasta vazia com o seguinte conteúdo:
+### Passo a Passo (Execução)
+
+1.  **Suba os containers (Frontend + Backend):**
+    O arquivo `docker-compose.yml` já está na raiz do projeto, configurado para baixar as imagens do Hub.
+    Abra o terminal na pasta raiz e execute:
+    ```bash
+    docker-compose up -d
+    ```
+    *Isso baixará as imagens `flipq/todostreak-back:latest` e `flipq/todostreak-front:latest`.*
+
+2.  **Execute as Migrações do Banco de Dados (ESSENCIAL):**
+    O banco de dados SQLite precisa ser configurado. Execute este comando APÓS a inicialização:
+    ```bash
+    docker-compose exec backend python manage.py migrate
+    ```
+
+3.  **Acesse a Aplicação:**
+    * Frontend (Site): http://localhost:8080
+    * Backend API (Swagger): http://localhost:8000/api/docs/
+
+---
+
+## ⚙️ Arquivo `docker-compose.yml` (Versão Publicada)
+
+O arquivo `docker-compose.yml` na raiz do projeto possui o seguinte conteúdo:
 
 ```yaml
 version: '3.8'
-
 services:
   backend:
     image: flipq/todostreak-back:latest
