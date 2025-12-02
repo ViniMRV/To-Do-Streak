@@ -1,4 +1,4 @@
-export const API_URL = 'https://vigilant-train-q7v45w55xxqj39xp7-8000.app.github.dev';
+export const API_URL = 'http://localhost:8000';
 export function getAuthHeaders() {
     const token = localStorage.getItem('access_token');
     return {

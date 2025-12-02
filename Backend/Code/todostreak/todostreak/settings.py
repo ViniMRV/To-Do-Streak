@@ -55,13 +55,15 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "todostreak.urls"
 
-FRONTEND_DOMAIN = "vigilant-train-q7v45w55xxqj39xp7-8000.app.github.dev"
+FRONTEND_DOMAIN = "localhost:8080"
 
 CORS_ALLOW_CREDENTIALS = True  
 
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:8000",
     "https://localhost:8000",
+    "http://localhost:8080",
+    "https://localhost:8080",
     "https://*.github.dev",
     f"http://{FRONTEND_DOMAIN}",
     f"https://{FRONTEND_DOMAIN}"

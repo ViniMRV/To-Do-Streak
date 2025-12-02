@@ -40,13 +40,10 @@ class RegisterUserView(APIView):
         if serializer.is_valid():
             user = serializer.save()
 
-            # --- CORREÇÃO: URL DO SEU CODESPACE ---
-            # Isso garante que o link no e-mail abra no lugar certo (público)
-            backend_domain = "vigilant-train-q7v45w55xxqj39xp7-8000.app.github.dev"
-            protocol = "https"
+            backend_domain = "localhost:8000"  # padrão para desenvolvimento local
+            protocol = "http"
             
             activation_link = f"{protocol}://{backend_domain}/users/activate/{user.activation_token}/"
-            # --------------------------------------
 
             try:                
                 send_mail(
