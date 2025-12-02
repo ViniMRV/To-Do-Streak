@@ -25,6 +25,8 @@ CSRF_TRUSTED_ORIGINS = [
     "http://localhost:8000",
     "https://localhost:8000",
     "https://*.github.dev",
+    "http://localhost:8080",
+    "https://localhost:8080",
 ]
 
 INSTALLED_APPS = [
