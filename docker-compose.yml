@@ -2,14 +2,14 @@ version: '3.8'
 
 services:
   backend:
-    build: ./Backend/Code  # <--- Note que o build pertence ao 'backend'
+    # Você escreve o SEU usuário aqui:
+    image: flipq/todostreak-back:latest
     ports:
       - "8000:8000"
-    volumes:
-      - ./Backend/Code/todostreak/db.sqlite3:/app/todostreak/db.sqlite3
 
   frontend:
-    build: ./Frontend/Code # <--- Note que o build pertence ao 'frontend'
+    # E aqui também:
+    image: flipq/todostreak-front:latest
     ports:
       - "8080:80"
     depends_on:

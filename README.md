@@ -62,15 +62,19 @@ Para rodar a aplicação completa (Backend + Frontend) utilizando as imagens pub
 
 ```yaml
 version: '3.8'
+
 services:
   backend:
-    image: [SEU_USUARIO_DOCKERHUB]/todostreak-back:v1
+    image: flipq/todostreak-back:latest
     ports:
       - "8000:8000"
+
   frontend:
-    image: [SEU_USUARIO_DOCKERHUB]/todostreak-front:v1
+    image: flipq/todostreak-front:latest
     ports:
       - "8080:80"
+    depends_on:
+      - backend
 ```
 
 2. Abra o terminal na mesma pasta e execute:
