@@ -1,16 +1,16 @@
-To-Do Streak 🔥
+# To-Do Streak 🔥
 
 Uma plataforma web de lista de tarefas (To-Do List) focada em construir e manter hábitos através de um sistema gamificado de "streaks" (sequências).
 
 Este projeto foi desenvolvido como o Segundo Trabalho de Programação para Web (2025/2).
 
-👥 Criadores
+## Integrantes
 
 Vinícius Machado da Rocha Viana – Matrícula: 2111343
 
 Filipe Rogenfisch Quintans – Matrícula: 2020857
 
-📖 Descrição do Projeto
+## Descrição do Projeto
 
 O To-Do List Gamificada é uma aplicação web que une um backend em Django (servindo uma API REST) e um frontend em HTML/CSS/TypeScript.
 
@@ -18,72 +18,99 @@ A ideia central é simples: o usuário cadastra suas tarefas diárias. Para cada
 
 O objetivo é incentivar a consistência e a criação de hábitos diários de forma lúdica e recompensadora.
 
-🚀 Funcionalidades
+## Funcionalidades
 
-Gerenciamento de Usuários Completo:
-
+### Gerenciamento de Usuários Completo:
 Cadastro de novas contas.
-
 Autenticação (Login/Logout).
-
 Funcionalidade de "Esqueci minha senha" para recuperação/troca.
 
-Gerenciamento da Lista de Tarefas (CRUD):
-
+### Gerenciamento da Lista de Tarefas (CRUD):
 Criar novas tarefas na lista principal.
-
 Editar o texto de tarefas existentes.
-
 Excluir tarefas que não são mais necessárias.
 
-Interação com a Lista:
-
+### Interação com a Lista:
 Marcar tarefas como concluídas ou pendentes.
-
 Reordenar tarefas na lista (arrastar e soltar ou mover para cima/baixo).
 
-Sistema de Gamificação (Streak):
-
+### Sistema de Gamificação (Streak):
 Contador de "streak" visível que incrementa +1 a cada dia 100% concluído.
-
 Reset automático do "streak" para 0 caso o usuário falhe em completar o dia.
 
-Reset Diário:
-
+### Reset Diário:
 O "check" (marcação de concluído) de todas as tarefas é resetado automaticamente todo dia (à meia-noite), permitindo que a lista seja refeita no dia seguinte.
 
-🛠️ Tecnologias Utilizadas
+## Tecnologias Utilizadas
 
 Backend: Django (API REST com Django Rest Framework)
-
 Frontend: HTML5, CSS3, TypeScript
-
 Banco de Dados: SQLite (padrão) / PostgreSQL (via Docker)
-
 Documentação da API: Swagger / OpenAPI (integrado ao DRF)
-
 Autenticação: Sistema de autenticação do Django (Tokens ou Sessão)
-
 Infraestrutura: Docker & Docker Compose
 
-🐳 Como Usar (Docker)
-
-(Esta seção será preenchida com as instruções de deploy via Docker)
-
-Pré-requisitos
-
+## Como Usar (Docker)
+### Pré-requisitos:
 Docker
-
 Docker Compose
 
-Instruções Backend
+### Passo a Passo (Docker Compose)
+Para rodar a aplicação completa (Backend + Frontend) utilizando as imagens publicadas:
 
-# (Instruções para buildar e rodar o container do backend)
+1. Crie um arquivo chamado `docker-compose.yml` na raiz de uma pasta vazia com o seguinte conteúdo:
 
+```yaml
+version: '3.8'
+services:
+  backend:
+    image: [SEU_USUARIO_DOCKERHUB]/todostreak-back:v1
+    ports:
+      - "8000:8000"
+  frontend:
+    image: [SEU_USUARIO_DOCKERHUB]/todostreak-front:v1
+    ports:
+      - "8080:80"
+```
 
-Instruções Frontend
+2. Abra o terminal na mesma pasta e execute:
+   `docker-compose up`
 
-# (Instruções para buildar e rodar o container do frontend)
+3. Acesse a aplicação:
+   * **Frontend:** http://localhost:8080
+   * **Backend API:** http://localhost:8000
+
+## Instruções Backend
+
+Para construir a imagem do zero e rodar o container do backend isoladamente:
+
+1. Navegue até a pasta do código:
+   `cd Backend/Code`
+
+2. Construa a imagem Docker (substitua `[SEU_USUARIO]` pelo seu usuário do Docker Hub):
+   `docker build -t [SEU_USUARIO]/todostreak-back:v1 .`
+
+3. Envie para o Docker Hub (requer login):
+   `docker push [SEU_USUARIO]/todostreak-back:v1`
+
+4. Rode o container:
+   `docker run -d -p 8000:8000 [SEU_USUARIO]/todostreak-back:v1`
+
+## Instruções Frontend
+
+ Para construir a imagem do zero e rodar o container do frontend isoladamente:
+
+1. Navegue até a pasta do código:
+   `cd Frontend/Code`
+
+2. Construa a imagem Docker:
+   `docker build -t [SEU_USUARIO]/todostreak-front:v1 .`
+
+3. Envie para o Docker Hub (requer login):
+   `docker push [SEU_USUARIO]/todostreak-front:v1`
+
+4. Rode o container (a porta interna 80 é mapeada para a 8080):
+   `docker run -d -p 8080:80 [SEU_USUARIO]/todostreak-front:v1`
 
 
 Acessando a Aplicação
@@ -141,13 +168,13 @@ Todo dia, à meia-noite, todas as suas tarefas voltarão ao estado "pendente" (d
 (Mínimo de 3 imagens do site)
 
 Imagem 1: (Tela de Login ou Cadastro)
-[Insira a Imagem da Tela de Login aqui]
+![tela de login](image.png)
 
 Imagem 2: (Tela Principal com a Lista de Tarefas e o Streak)
-[Insira a Imagem da Tela Principal aqui]
+![tela principal](image-1.png)
 
 Imagem 3: (Tela de Edição de Tarefa ou Recuperação de Senha)
-[Insira a Imagem da Tela de Edição aqui]
+![tela edicao tarefa](image-2.png)
 
 ## Documentação da API (Swagger)
 
