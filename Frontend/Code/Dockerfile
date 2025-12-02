@@ -8,4 +8,4 @@ FROM nginx:alpine
 COPY public /usr/share/nginx/html
 
 # Expõe a porta 80 (padrão web interna)
-EXPOSE 8080
+EXPOSE 80
